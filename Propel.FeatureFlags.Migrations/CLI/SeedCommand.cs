@@ -5,9 +5,16 @@ using System.CommandLine;
 
 namespace Propel.FeatureFlags.Migrations.CLI;
 
-public class SeedCommand(IServiceProvider serviceProvider)
+public class SeedCommand
 {
-	private readonly ILogger<SeedCommand> _logger = serviceProvider.GetRequiredService<ILogger<SeedCommand>>();
+	private readonly IServiceProvider _serviceProvider;
+	private readonly ILogger<SeedCommand> _logger;
+
+	public SeedCommand(IServiceProvider serviceProvider)
+	{
+		_serviceProvider = serviceProvider;
+		_logger = serviceProvider.GetRequiredService<ILogger<SeedCommand>>();
+	}
 
 	public async Task ExecuteAsync(
 		string? connectionString,
@@ -18,6 +25,7 @@ public class SeedCommand(IServiceProvider serviceProvider)
 		string? username,
 		string? password,
 		int? port,
+		string? schema,
 		AuthenticationMode authMode)
 	{
 		try
@@ -33,6 +41,7 @@ public class SeedCommand(IServiceProvider serviceProvider)
 				password ?? EnvironmentHelper.GetPasswordFromEnvironment(),
 				port ?? EnvironmentHelper.GetPortFromEnvironment(),
 				provider ?? EnvironmentHelper.GetProviderFromEnvironment(),
+				schema ?? EnvironmentHelper.GetSchemaFromEnvironment(),
 				authMode);
 
 			// Auto-detect provider if not specified
@@ -43,7 +52,7 @@ public class SeedCommand(IServiceProvider serviceProvider)
 			_logger.LogInformation("Provider: {Provider}", finalProvider);
 			_logger.LogInformation("Seeds Path: {SeedsPath}", seedsPath);
 
-			var seedService = serviceProvider.GetRequiredService<ISeedService>();
+			var seedService = _serviceProvider.GetRequiredService<ISeedService>();
 			await seedService.SeedAsync(finalConnectionString, finalProvider, seedsPath);
 
 			_logger.LogInformation("Seeding completed successfully!");
@@ -96,6 +105,12 @@ public class SeedCommand(IServiceProvider serviceProvider)
 			IsRequired = false
 		};
 
+		var schemaOption = new Option<string?>("--schema")
+		{
+			Description = "PostgreSQL schema name (search_path)",
+			IsRequired = false
+		};
+
 		var providerOption = new Option<string?>("--provider")
 		{
 			Description = "Database provider: sqlserver or postgresql (auto-detected if not specified)",
@@ -122,6 +137,7 @@ public class SeedCommand(IServiceProvider serviceProvider)
 		seedCommand.AddOption(usernameOption);
 		seedCommand.AddOption(passwordOption);
 		seedCommand.AddOption(portOption);
+		seedCommand.AddOption(schemaOption);
 		seedCommand.AddOption(providerOption);
 		seedCommand.AddOption(authModeOption);
 		seedCommand.AddOption(seedsPathOption);
@@ -136,10 +152,11 @@ public class SeedCommand(IServiceProvider serviceProvider)
 			var username = context.ParseResult.GetValueForOption(usernameOption);
 			var password = context.ParseResult.GetValueForOption(passwordOption);
 			var port = context.ParseResult.GetValueForOption(portOption);
+			var schema = context.ParseResult.GetValueForOption(schemaOption);
 			var authMode = context.ParseResult.GetValueForOption(authModeOption);
 
 			await ExecuteAsync(connectionString, provider, seedsPath,
-				host, database, username, password, port, authMode);
+				host, database, username, password, port, schema, authMode);
 		});
 
 		return seedCommand;

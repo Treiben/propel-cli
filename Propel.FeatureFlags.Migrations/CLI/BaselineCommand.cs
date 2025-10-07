@@ -25,6 +25,7 @@ public class BaselineCommand
 		string? username,
 		string? password,
 		int? port,
+		string? schema,
 		AuthenticationMode authMode)
 	{
 		try
@@ -40,6 +41,7 @@ public class BaselineCommand
 				password ?? EnvironmentHelper.GetPasswordFromEnvironment(),
 				port ?? EnvironmentHelper.GetPortFromEnvironment(),
 				provider ?? EnvironmentHelper.GetProviderFromEnvironment(),
+				schema ?? EnvironmentHelper.GetSchemaFromEnvironment(),
 				authMode);
 
 			// Auto-detect provider if not specified
@@ -69,7 +71,7 @@ public class BaselineCommand
 		// Connection string options
 		var connectionStringOption = new Option<string?>("--connection-string")
 		{
-			Description = "Full database connection string (optional if using individual parameters)", 
+			Description = "Full database connection string (optional if using individual parameters)",
 			IsRequired = false
 		};
 
@@ -103,6 +105,12 @@ public class BaselineCommand
 			IsRequired = false
 		};
 
+		var schemaOption = new Option<string?>("--schema")
+		{
+			Description = "PostgreSQL schema name (search_path)",
+			IsRequired = false
+		};
+
 		var providerOption = new Option<string?>("--provider")
 		{
 			Description = "Database provider: sqlserver or postgresql (auto-detected if not specified)",
@@ -128,6 +136,7 @@ public class BaselineCommand
 		baselineCommand.AddOption(usernameOption);
 		baselineCommand.AddOption(passwordOption);
 		baselineCommand.AddOption(portOption);
+		baselineCommand.AddOption(schemaOption);
 		baselineCommand.AddOption(providerOption);
 		baselineCommand.AddOption(authModeOption);
 		baselineCommand.AddOption(baselineVersionOption);
@@ -142,10 +151,11 @@ public class BaselineCommand
 			var username = context.ParseResult.GetValueForOption(usernameOption);
 			var password = context.ParseResult.GetValueForOption(passwordOption);
 			var port = context.ParseResult.GetValueForOption(portOption);
+			var schema = context.ParseResult.GetValueForOption(schemaOption);
 			var authMode = context.ParseResult.GetValueForOption(authModeOption);
 
 			await ExecuteAsync(connectionString, provider, version,
-				host, database, username, password, port, authMode);
+				host, database, username, password, port, schema, authMode);
 		});
 
 		return baselineCommand;

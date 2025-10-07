@@ -5,9 +5,16 @@ using System.CommandLine;
 
 namespace Propel.FeatureFlags.Migrations.CLI;
 
-public class MigrateCommand(IServiceProvider serviceProvider)
+public class MigrateCommand
 {
-	private readonly ILogger<MigrateCommand> _logger = serviceProvider.GetRequiredService<ILogger<MigrateCommand>>();
+	private readonly IServiceProvider _serviceProvider;
+	private readonly ILogger<MigrateCommand> _logger;
+
+	public MigrateCommand(IServiceProvider serviceProvider)
+	{
+		_serviceProvider = serviceProvider;
+		_logger = serviceProvider.GetRequiredService<ILogger<MigrateCommand>>();
+	}
 
 	public async Task ExecuteAsync(
 		string? connectionString,
@@ -19,6 +26,7 @@ public class MigrateCommand(IServiceProvider serviceProvider)
 		string? username,
 		string? password,
 		int? port,
+		string? schema,
 		AuthenticationMode authMode)
 	{
 		try
@@ -34,6 +42,7 @@ public class MigrateCommand(IServiceProvider serviceProvider)
 				password ?? EnvironmentHelper.GetPasswordFromEnvironment(),
 				port ?? EnvironmentHelper.GetPortFromEnvironment(),
 				provider ?? EnvironmentHelper.GetProviderFromEnvironment(),
+				schema ?? EnvironmentHelper.GetSchemaFromEnvironment(),
 				authMode);
 
 			// Auto-detect provider if not specified
@@ -43,12 +52,17 @@ public class MigrateCommand(IServiceProvider serviceProvider)
 
 			_logger.LogInformation("Provider: {Provider}", finalProvider);
 
+			if (!string.IsNullOrEmpty(schema))
+			{
+				_logger.LogInformation("Schema: {Schema}", schema);
+			}
+
 			if (!string.IsNullOrEmpty(targetVersion))
 			{
 				_logger.LogInformation("Target Version: {TargetVersion}", targetVersion);
 			}
 
-			var migrationService = serviceProvider.GetRequiredService<IMigrationService>();
+			var migrationService = _serviceProvider.GetRequiredService<IMigrationService>();
 			await migrationService.MigrateAsync(finalConnectionString, finalProvider, migrationsPath, targetVersion);
 
 			_logger.LogInformation("Migration completed successfully!");
@@ -101,6 +115,12 @@ public class MigrateCommand(IServiceProvider serviceProvider)
 			IsRequired = false
 		};
 
+		var schemaOption = new Option<string?>("--schema")
+		{
+			Description = "PostgreSQL schema name (search_path). Defaults to 'public' if not specified.",
+			IsRequired = false
+		};
+
 		var providerOption = new Option<string?>("--provider")
 		{
 			Description = "Database provider: sqlserver or postgresql (auto-detected if not specified)",
@@ -132,6 +152,7 @@ public class MigrateCommand(IServiceProvider serviceProvider)
 		migrateCommand.AddOption(usernameOption);
 		migrateCommand.AddOption(passwordOption);
 		migrateCommand.AddOption(portOption);
+		migrateCommand.AddOption(schemaOption);
 		migrateCommand.AddOption(providerOption);
 		migrateCommand.AddOption(authModeOption);
 		migrateCommand.AddOption(migrationsPathOption);
@@ -148,10 +169,11 @@ public class MigrateCommand(IServiceProvider serviceProvider)
 			var username = context.ParseResult.GetValueForOption(usernameOption);
 			var password = context.ParseResult.GetValueForOption(passwordOption);
 			var port = context.ParseResult.GetValueForOption(portOption);
+			var schema = context.ParseResult.GetValueForOption(schemaOption);
 			var authMode = context.ParseResult.GetValueForOption(authModeOption);
 
 			await ExecuteAsync(connectionString, provider, migrationsPath, targetVersion,
-				host, database, username, password, port, authMode);
+				host, database, username, password, port, schema, authMode);
 		});
 
 		return migrateCommand;

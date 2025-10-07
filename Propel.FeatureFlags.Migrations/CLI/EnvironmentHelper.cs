@@ -76,6 +76,16 @@ public static class EnvironmentHelper
 	}
 
 	/// <summary>
+	/// Gets PostgreSQL schema from environment variable
+	/// Environment variable name: DB_SCHEMA, POSTGRES_SCHEMA
+	/// </summary>
+	public static string? GetSchemaFromEnvironment()
+	{
+		return Environment.GetEnvironmentVariable("DB_SCHEMA") ??
+			   Environment.GetEnvironmentVariable("POSTGRES_SCHEMA");
+	}
+
+	/// <summary>
 	/// Gets migrations path from environment variable if not provided directly
 	/// Environment variable name: MIGRATIONS_PATH
 	/// </summary>

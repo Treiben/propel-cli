@@ -19,6 +19,7 @@ public static class ConnectionStringBuilder
 		string? password,
 		int? port,
 		string? provider,
+		string? schema = null,
 		AuthenticationMode authMode = AuthenticationMode.UserPassword,
 		Dictionary<string, string>? additionalParams = null)
 	{
@@ -52,7 +53,7 @@ public static class ConnectionStringBuilder
 		return detectedProvider.ToLowerInvariant() switch
 		{
 			"postgresql" => BuildPostgreSqlConnection(
-				host, database, port ?? 5432, username, password, authMode, additionalParams),
+				host, database, port ?? 5432, username, password, schema, authMode, additionalParams),
 			"sqlserver" => BuildSqlServerConnection(
 				host, database, port ?? 1433, username, password, authMode, additionalParams),
 			_ => throw new ArgumentException($"Unsupported provider: {detectedProvider}")
@@ -127,6 +128,7 @@ public static class ConnectionStringBuilder
 		int port,
 		string? username,
 		string? password,
+		string? schema,
 		AuthenticationMode authMode,
 		Dictionary<string, string>? additionalParams)
 	{
@@ -137,6 +139,12 @@ public static class ConnectionStringBuilder
 			Port = port,
 			Timeout = 30
 		};
+
+		// Set schema (search_path) if provided
+		if (!string.IsNullOrWhiteSpace(schema))
+		{
+			builder.SearchPath = schema;
+		}
 
 		switch (authMode)
 		{

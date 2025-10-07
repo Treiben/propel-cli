@@ -5,9 +5,16 @@ using System.CommandLine;
 
 namespace Propel.FeatureFlags.Migrations.CLI;
 
-public class StatusCommand(IServiceProvider serviceProvider)
+public class StatusCommand
 {
-	private readonly ILogger<StatusCommand> _logger = serviceProvider.GetRequiredService<ILogger<StatusCommand>>();
+	private readonly IServiceProvider _serviceProvider;
+	private readonly ILogger<StatusCommand> _logger;
+
+	public StatusCommand(IServiceProvider serviceProvider)
+	{
+		_serviceProvider = serviceProvider;
+		_logger = serviceProvider.GetRequiredService<ILogger<StatusCommand>>();
+	}
 
 	public async Task ExecuteAsync(
 		string? connectionString,
@@ -18,6 +25,7 @@ public class StatusCommand(IServiceProvider serviceProvider)
 		string? username,
 		string? password,
 		int? port,
+		string? schema,
 		AuthenticationMode authMode)
 	{
 		try
@@ -33,6 +41,7 @@ public class StatusCommand(IServiceProvider serviceProvider)
 				password ?? EnvironmentHelper.GetPasswordFromEnvironment(),
 				port ?? EnvironmentHelper.GetPortFromEnvironment(),
 				provider ?? EnvironmentHelper.GetProviderFromEnvironment(),
+				schema ?? EnvironmentHelper.GetSchemaFromEnvironment(),
 				authMode);
 
 			// Auto-detect provider if not specified
@@ -42,7 +51,7 @@ public class StatusCommand(IServiceProvider serviceProvider)
 
 			_logger.LogInformation("Provider: {Provider}", finalProvider);
 
-			var migrationService = serviceProvider.GetRequiredService<IMigrationService>();
+			var migrationService = _serviceProvider.GetRequiredService<IMigrationService>();
 			var status = await migrationService.GetStatusAsync(finalConnectionString, finalProvider, migrationsPath);
 
 			Console.WriteLine("\nMigration Status:");
@@ -112,6 +121,12 @@ public class StatusCommand(IServiceProvider serviceProvider)
 			IsRequired = false
 		};
 
+		var schemaOption = new Option<string?>("--schema")
+		{
+			Description = "PostgreSQL schema name (search_path)",
+			IsRequired = false
+		};
+
 		var providerOption = new Option<string?>("--provider")
 		{
 			Description = "Database provider: sqlserver or postgresql (auto-detected if not specified)",
@@ -137,6 +152,7 @@ public class StatusCommand(IServiceProvider serviceProvider)
 		statusCommand.AddOption(usernameOption);
 		statusCommand.AddOption(passwordOption);
 		statusCommand.AddOption(portOption);
+		statusCommand.AddOption(schemaOption);
 		statusCommand.AddOption(providerOption);
 		statusCommand.AddOption(authModeOption);
 		statusCommand.AddOption(migrationsPathOption);
@@ -151,10 +167,11 @@ public class StatusCommand(IServiceProvider serviceProvider)
 			var username = context.ParseResult.GetValueForOption(usernameOption);
 			var password = context.ParseResult.GetValueForOption(passwordOption);
 			var port = context.ParseResult.GetValueForOption(portOption);
+			var schema = context.ParseResult.GetValueForOption(schemaOption);
 			var authMode = context.ParseResult.GetValueForOption(authModeOption);
 
 			await ExecuteAsync(connectionString, provider, migrationsPath,
-				host, database, username, password, port, authMode);
+				host, database, username, password, port, schema, authMode);
 		});
 
 		return statusCommand;

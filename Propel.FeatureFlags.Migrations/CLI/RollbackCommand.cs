@@ -26,6 +26,7 @@ public class RollbackCommand
 		string? username,
 		string? password,
 		int? port,
+		string? schema,
 		AuthenticationMode authMode)
 	{
 		try
@@ -41,6 +42,7 @@ public class RollbackCommand
 				password ?? EnvironmentHelper.GetPasswordFromEnvironment(),
 				port ?? EnvironmentHelper.GetPortFromEnvironment(),
 				provider ?? EnvironmentHelper.GetProviderFromEnvironment(),
+				schema ?? EnvironmentHelper.GetSchemaFromEnvironment(),
 				authMode);
 
 			// Auto-detect provider if not specified
@@ -104,6 +106,12 @@ public class RollbackCommand
 			IsRequired = false
 		};
 
+		var schemaOption = new Option<string?>("--schema")
+		{
+			Description = "PostgreSQL schema name (search_path)",
+			IsRequired = false
+		};
+
 		var providerOption = new Option<string?>("--provider")
 		{
 			Description = "Database provider: sqlserver or postgresql (auto-detected if not specified)",
@@ -135,6 +143,7 @@ public class RollbackCommand
 		rollbackCommand.AddOption(usernameOption);
 		rollbackCommand.AddOption(passwordOption);
 		rollbackCommand.AddOption(portOption);
+		rollbackCommand.AddOption(schemaOption);
 		rollbackCommand.AddOption(providerOption);
 		rollbackCommand.AddOption(authModeOption);
 		rollbackCommand.AddOption(migrationsPathOption);
@@ -151,10 +160,11 @@ public class RollbackCommand
 			var username = context.ParseResult.GetValueForOption(usernameOption);
 			var password = context.ParseResult.GetValueForOption(passwordOption);
 			var port = context.ParseResult.GetValueForOption(portOption);
+			var schema = context.ParseResult.GetValueForOption(schemaOption);
 			var authMode = context.ParseResult.GetValueForOption(authModeOption);
 
 			await ExecuteAsync(connectionString, provider, migrationsPath, version,
-				host, database, username, password, port, authMode);
+				host, database, username, password, port, schema, authMode);
 		});
 
 		return rollbackCommand;
