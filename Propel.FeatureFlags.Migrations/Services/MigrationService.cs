@@ -80,7 +80,7 @@ public class MigrationService : IMigrationService
 		var appliedMigrations = await dbProvider.GetAppliedMigrationsAsync(connectionString);
 
 		var migrationsToRollback = appliedMigrations
-			.Where(m => string.Compare(m.Version, targetVersion, StringComparison.Ordinal) > 0)
+			.Where(m => string.Compare(m.Version, targetVersion, StringComparison.Ordinal) >= 0)
 			.OrderByDescending(m => m.Version);
 
 		foreach (var appliedMigration in migrationsToRollback)

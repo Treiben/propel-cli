@@ -6,8 +6,6 @@ namespace Propel.FeatureFlags.Migrations.Providers;
 
 public class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDatabaseProvider
 {
-	private string _schema = "public";
-
 	public async Task<bool> DatabaseExistsAsync(string connectionString)
 	{
 		var builder = new NpgsqlConnectionStringBuilder(connectionString);
@@ -22,6 +20,9 @@ public class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDatabaseP
 		command.Parameters.AddWithValue("@DatabaseName", databaseName!);
 
 		var count = Convert.ToInt32(await command.ExecuteScalarAsync());
+		if ( count > 0)
+			await CreateSchemaIfNotExistsAsync(connectionString);
+
 		return count > 0;
 	}
 
@@ -48,11 +49,11 @@ public class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDatabaseP
 	private async Task CreateSchemaIfNotExistsAsync(string connectionString)
 	{
 		var builder = new NpgsqlConnectionStringBuilder(connectionString);
-		_schema = string.IsNullOrWhiteSpace(builder.SearchPath) ? "public" : builder.SearchPath;
+		var schema = string.IsNullOrWhiteSpace(builder.SearchPath) ? "public" : builder.SearchPath;
 
 		logger.LogInformation("Creating schema...");
 
-		var sql = $@"CREATE SCHEMA IF NOT EXISTS ""{_schema}"";";
+		var sql = $@"CREATE SCHEMA IF NOT EXISTS ""{schema}"";";
 
 		using var connection = new NpgsqlConnection(connectionString);
 		using var command = new NpgsqlCommand(sql, connection);
@@ -60,21 +61,26 @@ public class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDatabaseP
 		await connection.OpenAsync();
 		await command.ExecuteNonQueryAsync();
 
-		logger.LogInformation("Schema '{Schema}' created successfully.", _schema);
+		logger.LogInformation("Schema '{Schema}' created successfully.", schema);
 	}
 
 	public async Task<bool> MigrationTableExistsAsync(string connectionString)
 	{
+		var builder = new NpgsqlConnectionStringBuilder(connectionString);
+		var schema = string.IsNullOrWhiteSpace(builder.SearchPath) ? "public" : builder.SearchPath;
+
+		logger.LogInformation($"Checking for migration history table in {schema} schema...");
+
 		using var connection = new NpgsqlConnection(connectionString);
 		await connection.OpenAsync();
 
 		var sql = $@"
             SELECT COUNT(*) 
             FROM information_schema.tables 
-            WHERE table_schema = '{_schema}' AND table_name = '__migrationhistory'";
+            WHERE table_schema = '{schema}' AND table_name = '__migrationhistory'";
 
 		using var command = new NpgsqlCommand(sql, connection);
-		var count = Convert.ToInt32(await command.ExecuteScalarAsync());
+		var count = Convert.ToInt64(await command.ExecuteScalarAsync() ?? 0);
 		return count > 0;
 	}
 
