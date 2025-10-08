@@ -37,16 +37,12 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       
-      - name: Build
-        run: dotnet build -c Release --no-restore /p:Version=${{ steps.version.outputs.VERSION }}
-      
-      - name: Test (if tests exist)
-        run: dotnet test -c Release --no-build --verbosity normal || echo "No tests found"
-        continue-on-error: true
+      - name: Restore dependencies
+        run: dotnet restore
       
       - name: Pack
-        run: dotnet pack -c Release --no-build -o ./artifacts /p:Version=${{ steps.version.outputs.VERSION }}
-      
+        run: dotnet pack -c Release -o ./artifacts /p:Version=${{ steps.version.outputs.VERSION }}
+
       - name: Push to NuGet.org
         run: |
           dotnet nuget push ./artifacts/*.nupkg \
