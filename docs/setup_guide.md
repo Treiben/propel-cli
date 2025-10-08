@@ -331,54 +331,6 @@ steps:
 
 ---
 
-## Production Checklist
-
-Before deploying to production, ensure:
-
-### Security
-
-- [ ] Database credentials stored in secrets manager (not in code)
-- [ ] Database user has minimum required permissions
-- [ ] SSL/TLS enabled for database connections
-- [ ] Network security rules configured (firewall, security groups)
-
-### Database Preparation
-
-- [ ] Database backup completed
-- [ ] Maintenance window scheduled (if needed)
-- [ ] Rollback plan documented
-- [ ] Database performance baseline recorded
-
-### Testing
-
-- [ ] Migrations tested in development environment
-- [ ] Migrations tested in staging environment (if available)
-- [ ] Rollback procedure tested
-- [ ] Performance impact assessed
-
-### Monitoring
-
-- [ ] Database monitoring enabled
-- [ ] Application logging configured
-- [ ] Alerts configured for migration failures
-- [ ] Success/failure notifications set up
-
-### Documentation
-
-- [ ] Migration runbook created
-- [ ] Rollback procedure documented
-- [ ] Emergency contacts listed
-- [ ] Troubleshooting guide prepared
-
-### CI/CD Pipeline
-
-- [ ] Pipeline tested in non-production environment
-- [ ] Manual approval gate configured (for production)
-- [ ] Retry logic implemented
-- [ ] Timeout configured appropriately
-
----
-
 ## Common Scenarios
 
 ### Scenario 1: Local Development
@@ -536,15 +488,8 @@ propel-cli status  # Check which migrations are applied
 ## Next Steps
 
 1. **Explore Commands**: Try `rollback`, `baseline`, and `seed` commands
-2. **Read Documentation**: Check [README.md](README.md) for full command reference
-3. **CI/CD Integration**: Set up automated migrations using [CI-CD-EXAMPLES.md](CI-CD-EXAMPLES.md)
+2. **Read Documentation**: Check [README.md](..\README.md) for full command reference
+3. **CI/CD Integration**: Set up automated migrations using [cicd_examples.md](cicd_examplesS.md)
 4. **Create Custom Migrations**: Learn how to add your own migrations (see README.md)
 
----
 
-## Getting Help
-
-- **Documentation**: [README.md](README.md)
-- **CI/CD Examples**: [CI-CD-EXAMPLES.md](CI-CD-EXAMPLES.md)
-- **Issues**: [GitHub Issues](https://github.com/Treiben/propel-cli/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Treiben/propel-cli/discussions)

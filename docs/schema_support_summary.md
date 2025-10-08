@@ -202,11 +202,7 @@ propel-cli migrate --schema tenant_c
 
 The CLI **does automatically create schemas** if they do not exist. However, the user must have permission to create schemas.
 
-```sql
-CREATE SCHEMA IF NOT EXISTS myschema;
-```
-
-Or grant the migration user permission to create schemas:
+This is how to grant migration user permission to create schemas:
 ```sql
 GRANT CREATE ON DATABASE featureflags TO migration_user;
 ```
@@ -325,7 +321,3 @@ Consider these enhancements for future versions:
 2. **Schema validation** - Verify schema exists before running migrations
 3. **Multi-schema migrations** - Run migrations across multiple schemas in one command
 4. **Schema migration** - Tool to migrate data between schemas
-
----
-
-**Schema support is now complete and ready for production use!** 🎉
