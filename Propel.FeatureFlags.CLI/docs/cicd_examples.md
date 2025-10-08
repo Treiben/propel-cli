@@ -1,6 +1,6 @@
 # CI/CD Integration Examples
 
-Comprehensive examples for integrating the Migration CLI into various CI/CD platforms.
+Examples for integrating Propel CLI into various CI/CD platforms.
 
 ## Table of Contents
 
@@ -40,10 +40,10 @@ jobs:
           dotnet-version: '8.0.x'
       
       - name: Install Migration CLI
-        run: dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+        run: dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
       
       - name: Run Migrations
-        run: migrations-cli migrate
+        run: propel-cli migrate
         env:
           DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
 ```
@@ -78,10 +78,10 @@ jobs:
           dotnet-version: '8.0.x'
       
       - name: Install Migration CLI
-        run: dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+        run: dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
       
       - name: Run Migrations (${{ matrix.environment }})
-        run: migrations-cli migrate
+        run: propel-cli migrate
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
@@ -89,7 +89,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       
       - name: Check Migration Status
-        run: migrations-cli status
+        run: propel-cli status
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
@@ -113,12 +113,12 @@ jobs:
     steps:
       - name: Download Migration CLI
         run: |
-          wget https://github.com/yourorg/migrations-cli/releases/download/v1.0.0/migrations-cli-linux-x64.tar.gz
-          tar -xzf migrations-cli-linux-x64.tar.gz
-          chmod +x migrations-cli
+          wget https://github.com/Treiben/propel-cli/releases/download/v1.0.0/propel-cli-linux-x64.tar.gz
+          tar -xzf propel-cli-linux-x64.tar.gz
+          chmod +x propel-cli
       
       - name: Run Migrations
-        run: ./migrations-cli migrate
+        run: ./propel-cli migrate
         env:
           DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
 ```
@@ -152,14 +152,14 @@ jobs:
       
       - name: Install or Update CLI
         run: |
-          if ! command -v migrations-cli &> /dev/null; then
-            dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+          if ! command -v propel-cli &> /dev/null; then
+            dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
           else
-            dotnet tool update -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+            dotnet tool update -g Propel.FeatureFlags.CLI --version 1.0.0
           fi
       
       - name: Run Migrations
-        run: migrations-cli migrate
+        run: propel-cli migrate
         env:
           DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
 ```
@@ -178,9 +178,9 @@ migrate-database:
   stage: migrate
   image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
-    - dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+    - dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
     - export PATH="$PATH:/root/.dotnet/tools"
-    - migrations-cli migrate
+    - propel-cli migrate
   variables:
     DB_CONNECTION_STRING: $DB_CONNECTION_STRING
   only:
@@ -196,10 +196,10 @@ stages:
 .migrate-template: &migrate-template
   image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
-    - dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+    - dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
     - export PATH="$PATH:/root/.dotnet/tools"
-    - migrations-cli migrate --host $DB_HOST --database $DB_DATABASE --username $DB_USERNAME --password $DB_PASSWORD
-    - migrations-cli status --host $DB_HOST --database $DB_DATABASE --username $DB_USERNAME --password $DB_PASSWORD
+    - propel-cli migrate --host $DB_HOST --database $DB_DATABASE --username $DB_USERNAME --password $DB_PASSWORD
+    - propel-cli status --host $DB_HOST --database $DB_DATABASE --username $DB_USERNAME --password $DB_PASSWORD
 
 migrate-dev:
   <<: *migrate-template
@@ -238,9 +238,9 @@ migrate-database:
   before_script:
     - apk add --no-cache curl
   script:
-    - curl -L https://github.com/yourorg/migrations-cli/releases/download/v1.0.0/migrations-cli-linux-x64.tar.gz | tar xz
-    - chmod +x migrations-cli
-    - ./migrations-cli migrate
+    - curl -L https://github.com/Treiben/propel-cli/releases/download/v1.0.0/propel-cli-linux-x64.tar.gz | tar xz
+    - chmod +x propel-cli
+    - ./propel-cli migrate
   variables:
     DB_CONNECTION_STRING: $DB_CONNECTION_STRING
 ```
@@ -265,9 +265,9 @@ steps:
       version: '8.0.x'
   
   - script: |
-      dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+      dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
       export PATH="$PATH:$HOME/.dotnet/tools"
-      migrations-cli migrate
+      propel-cli migrate
     displayName: 'Run Database Migrations'
     env:
       DB_CONNECTION_STRING: $(DbConnectionString)
@@ -293,9 +293,9 @@ stages:
               version: '8.0.x'
           
           - script: |
-              dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+              dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
               export PATH="$PATH:$HOME/.dotnet/tools"
-              migrations-cli migrate
+              propel-cli migrate
             displayName: 'Migrate Dev Database'
             env:
               DB_HOST: $(DevDbHost)
@@ -319,10 +319,10 @@ stages:
                     version: '8.0.x'
                 
                 - script: |
-                    dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+                    dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
                     export PATH="$PATH:$HOME/.dotnet/tools"
-                    migrations-cli migrate
-                    migrations-cli status
+                    propel-cli migrate
+                    propel-cli status
                   displayName: 'Migrate Production Database'
                   env:
                     DB_CONNECTION_STRING: $(ProdDbConnectionString)
@@ -349,7 +349,7 @@ pipeline {
     stages {
         stage('Install CLI') {
             steps {
-                sh 'dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0'
+                sh 'dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0'
             }
         }
         
@@ -357,7 +357,7 @@ pipeline {
             steps {
                 sh '''
                     export PATH="$PATH:/root/.dotnet/tools"
-                    migrations-cli migrate
+                    propel-cli migrate
                 '''
             }
         }
@@ -366,7 +366,7 @@ pipeline {
             steps {
                 sh '''
                     export PATH="$PATH:/root/.dotnet/tools"
-                    migrations-cli status
+                    propel-cli status
                 '''
             }
         }
@@ -389,14 +389,14 @@ pipeline {
 node {
     docker.image('mcr.microsoft.com/dotnet/sdk:8.0').inside {
         stage('Install CLI') {
-            sh 'dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0'
+            sh 'dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0'
         }
         
         stage('Migrate Dev') {
             withCredentials([string(credentialsId: 'dev-db-connection', variable: 'DB_CONNECTION_STRING')]) {
                 sh '''
                     export PATH="$PATH:/root/.dotnet/tools"
-                    migrations-cli migrate
+                    propel-cli migrate
                 '''
             }
         }
@@ -409,7 +409,7 @@ node {
             withCredentials([string(credentialsId: 'prod-db-connection', variable: 'DB_CONNECTION_STRING')]) {
                 sh '''
                     export PATH="$PATH:/root/.dotnet/tools"
-                    migrations-cli migrate
+                    propel-cli migrate
                 '''
             }
         }
@@ -438,13 +438,13 @@ jobs:
       
       - run:
           name: Install Migration CLI
-          command: dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+          command: dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
       
       - run:
           name: Run Migrations
           command: |
             export PATH="$PATH:/root/.dotnet/tools"
-            migrations-cli migrate
+            propel-cli migrate
           environment:
             DB_CONNECTION_STRING: ${DB_CONNECTION_STRING}
 
@@ -484,9 +484,9 @@ spec:
             - /bin/sh
             - -c
             - |
-              dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+              dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
               export PATH="$PATH:/root/.dotnet/tools"
-              migrations-cli migrate
+              propel-cli migrate
             env:
             - name: DB_CONNECTION_STRING
               valueFrom:
@@ -513,9 +513,9 @@ spec:
         - /bin/sh
         - -c
         - |
-          dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+          dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
           export PATH="$PATH:/root/.dotnet/tools"
-          migrations-cli migrate
+          propel-cli migrate
         env:
         - name: DB_HOST
           valueFrom:
@@ -576,10 +576,10 @@ services:
       DB_PASSWORD: postgres
     command: >
       sh -c "
-        dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0 &&
+        dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0 &&
         export PATH=\"$$PATH:/root/.dotnet/tools\" &&
         sleep 5 &&
-        migrations-cli migrate
+        propel-cli migrate
       "
   
   api:
@@ -606,9 +606,9 @@ resource "null_resource" "run_migrations" {
   
   provisioner "local-exec" {
     command = <<EOT
-      dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+      dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
       export PATH="$PATH:$HOME/.dotnet/tools"
-      migrations-cli migrate \
+      propel-cli migrate \
         --host ${aws_db_instance.feature_flags.endpoint} \
         --database ${aws_db_instance.feature_flags.db_name} \
         --username ${var.db_username} \
@@ -640,7 +640,7 @@ resource "null_resource" "run_migrations" {
 
 ### Path Issues
 
-If `migrations-cli: command not found`:
+If `propel-cli: command not found`:
 
 ```bash
 export PATH="$PATH:$HOME/.dotnet/tools"  # Linux/macOS
@@ -651,7 +651,7 @@ export PATH="$PATH:/root/.dotnet/tools"  # Docker containers
 
 Increase connection timeout:
 ```bash
-migrations-cli migrate --connection-string "Server=...; Connection Timeout=120; ..."
+propel-cli migrate --connection-string "Server=...; Connection Timeout=120; ..."
 ```
 
 ### Permission Issues

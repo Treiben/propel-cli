@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Migration CLI now fully supports custom PostgreSQL schemas via the `search_path` parameter. This allows migrations to run in schemas other than the default `public` schema.
+The Propel CLI migrations now fully supports custom PostgreSQL schemas via the `search_path` parameter. This allows migrations to run in schemas other than the default `public` schema.
 
 ## What Was Added
 
@@ -40,7 +40,7 @@ Added `--schema` option to all commands:
 ### Command-Line Parameter
 
 ```bash
-migrations-cli migrate \
+propel-cli migrate \
   --host localhost \
   --database featureflags \
   --username postgres \
@@ -52,7 +52,7 @@ migrations-cli migrate \
 
 ```bash
 export DB_SCHEMA=mycompany
-migrations-cli migrate \
+propel-cli migrate \
   --host localhost \
   --database featureflags \
   --username postgres \
@@ -62,7 +62,7 @@ migrations-cli migrate \
 ### Full Connection String
 
 ```bash
-migrations-cli migrate \
+propel-cli migrate \
   --connection-string "Host=localhost;Database=featureflags;Username=postgres;Password=postgres;SearchPath=mycompany"
 ```
 
@@ -102,7 +102,7 @@ The `PostgreSqlProvider` already had schema support built-in:
 psql -h localhost -U postgres -d featureflags -c "CREATE SCHEMA IF NOT EXISTS mycompany;"
 
 # Run migrations in custom schema
-migrations-cli migrate \
+propel-cli migrate \
   --host localhost \
   --database featureflags \
   --username postgres \
@@ -128,13 +128,13 @@ export DB_USERNAME=postgres
 export DB_PASSWORD=postgres
 export DB_SCHEMA=mycompany
 
-migrations-cli migrate
+propel-cli migrate
 ```
 
 ### Test 3: Check Status in Custom Schema
 
 ```bash
-migrations-cli status \
+propel-cli status \
   --host localhost \
   --database featureflags \
   --username postgres \
@@ -145,7 +145,7 @@ migrations-cli status \
 ### Test 4: Rollback in Custom Schema
 
 ```bash
-migrations-cli rollback \
+propel-cli rollback \
   --version 00000000000000 \
   --host localhost \
   --database featureflags \
@@ -160,26 +160,26 @@ migrations-cli rollback \
 
 ```bash
 # Development (public schema)
-migrations-cli migrate --schema public
+propel-cli migrate --schema public
 
 # Staging (staging schema)
-migrations-cli migrate --schema staging
+propel-cli migrate --schema staging
 
 # Production (production schema)
-migrations-cli migrate --schema production
+propel-cli migrate --schema production
 ```
 
 ### Scenario 2: Multi-Tenant with Schema-per-Tenant
 
 ```bash
 # Tenant A
-migrations-cli migrate --schema tenant_a
+propel-cli migrate --schema tenant_a
 
 # Tenant B
-migrations-cli migrate --schema tenant_b
+propel-cli migrate --schema tenant_b
 
 # Tenant C
-migrations-cli migrate --schema tenant_c
+propel-cli migrate --schema tenant_c
 ```
 
 ### Scenario 3: CI/CD with Dynamic Schemas
@@ -187,7 +187,7 @@ migrations-cli migrate --schema tenant_c
 ```yaml
 # GitHub Actions
 - name: Run Migrations
-  run: migrations-cli migrate
+  run: propel-cli migrate
   env:
     DB_HOST: ${{ secrets.DB_HOST }}
     DB_DATABASE: ${{ secrets.DB_DATABASE }}
@@ -200,7 +200,7 @@ migrations-cli migrate --schema tenant_c
 
 ### Schema Creation
 
-The CLI **does not automatically create schemas**. The schema must exist before running migrations:
+The CLI **does automatically create schemas** if they do not exist. However, the user must have permission to create schemas.
 
 ```sql
 CREATE SCHEMA IF NOT EXISTS myschema;
@@ -267,7 +267,7 @@ GRANT ALL ON SCHEMA myschema TO migration_user;
 
 **Solution**: Always explicitly specify schema when not using `public`:
 ```bash
-migrations-cli migrate --schema myschema ...
+propel-cli migrate --schema myschema ...
 ```
 
 ## Migration Considerations

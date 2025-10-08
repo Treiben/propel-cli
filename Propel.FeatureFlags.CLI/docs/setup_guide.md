@@ -1,6 +1,6 @@
 # Setup Guide
 
-Complete setup guide for the Feature Flags Migration CLI - from installation to your first migration.
+Complete setup guide for the Feature Flags CLI - from installation to your first migration.
 
 ## Table of Contents
 
@@ -51,40 +51,40 @@ Complete setup guide for the Feature Flags Migration CLI - from installation to 
 
 ```bash
 # Install
-dotnet tool install -g Propel.FeatureFlags.MigrationsCLI
+dotnet tool install -g Propel.FeatureFlags.CLI
 
 # Verify installation
-migrations-cli --version
+propel-cli --version
 
 # Update (when new version available)
-dotnet tool update -g Propel.FeatureFlags.MigrationsCLI
+dotnet tool update -g Propel.FeatureFlags.CLI
 
 # Uninstall
-dotnet tool uninstall -g Propel.FeatureFlags.MigrationsCLI
+dotnet tool uninstall -g Propel.FeatureFlags.CLI
 ```
 
 ### Option 2: Download Binary
 
-1. Go to [Releases](https://github.com/yourorg/propel-featureflags-migrations/releases/latest)
+1. Go to [Releases](https://github.com/Treiben/propel-cli/releases/latest)
 2. Download for your platform:
-   - **Linux**: `migrations-cli-linux-x64.tar.gz`
-   - **Windows**: `migrations-cli-win-x64.zip`
-   - **macOS Intel**: `migrations-cli-osx-x64.tar.gz`
-   - **macOS Apple Silicon**: `migrations-cli-osx-arm64.tar.gz`
+   - **Linux**: `propel-cli-linux-x64.tar.gz`
+   - **Windows**: `propel-cli-win-x64.zip`
+   - **macOS Intel**: `propel-cli-osx-x64.tar.gz`
+   - **macOS Apple Silicon**: `propel-cli-osx-arm64.tar.gz`
 
 3. Extract and install:
 
 **Linux/macOS:**
 ```bash
-tar -xzf migrations-cli-linux-x64.tar.gz
-sudo mv migrations-cli /usr/local/bin/
-chmod +x /usr/local/bin/migrations-cli
+tar -xzf propel-cli-linux-x64.tar.gz
+sudo mv propel-cli /usr/local/bin/
+chmod +x /usr/local/bin/propel-cli
 ```
 
 **Windows:**
 ```powershell
-# Extract migrations-cli-win-x64.zip
-# Add directory to PATH or copy migrations-cli.exe to a directory in PATH
+# Extract propel-cli-win-x64.zip
+# Add directory to PATH or copy propel-cli.exe to a directory in PATH
 ```
 
 ---
@@ -123,7 +123,7 @@ $env:DB_PASSWORD="your_password"
 You can pass connection details directly:
 
 ```bash
-migrations-cli migrate \
+propel-cli migrate \
   --host localhost \
   --database featureflags \
   --username postgres \
@@ -133,7 +133,7 @@ migrations-cli migrate \
 ### Method 3: Connection String
 
 ```bash
-migrations-cli migrate \
+propel-cli migrate \
   --connection-string "Host=localhost;Database=featureflags;Username=postgres;Password=your_password"
 ```
 
@@ -147,10 +147,10 @@ Test that you can connect to your database:
 
 ```bash
 # Using environment variables
-migrations-cli status
+propel-cli status
 
 # Or with parameters
-migrations-cli status --host localhost --database featureflags --username postgres --password your_password
+propel-cli status --host localhost --database featureflags --username postgres --password your_password
 ```
 
 **Expected Output (if no migrations have run):**
@@ -170,7 +170,7 @@ Version              Status     Applied At           Description
 The CLI comes with an embedded initial migration that creates the Feature Flags schema:
 
 ```bash
-migrations-cli migrate
+propel-cli migrate
 ```
 
 **Expected Output:**
@@ -187,7 +187,7 @@ Migration completed successfully!
 Check that the migration was applied:
 
 ```bash
-migrations-cli status
+propel-cli status
 ```
 
 **Expected Output:**
@@ -270,10 +270,10 @@ jobs:
           dotnet-version: '8.0.x'
       
       - name: Install Migration CLI
-        run: dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+        run: dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
       
       - name: Run Migrations
-        run: migrations-cli migrate
+        run: propel-cli migrate
         env:
           DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
 ```
@@ -290,9 +290,9 @@ migrate:
   stage: migrate
   image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
-    - dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+    - dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
     - export PATH="$PATH:/root/.dotnet/tools"
-    - migrations-cli migrate
+    - propel-cli migrate
   variables:
     DB_CONNECTION_STRING: $DB_CONNECTION_STRING
   only:
@@ -316,9 +316,9 @@ steps:
       version: '8.0.x'
   
   - script: |
-      dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0
+      dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0
       export PATH="$PATH:$HOME/.dotnet/tools"
-      migrations-cli migrate
+      propel-cli migrate
     env:
       DB_CONNECTION_STRING: $(DbConnectionString)
 ```
@@ -391,16 +391,16 @@ export DB_USERNAME=dev
 export DB_PASSWORD=dev
 
 # Run migrations
-migrations-cli migrate
+propel-cli migrate
 
 # Check status
-migrations-cli status
+propel-cli status
 ```
 
 ### Scenario 2: Azure SQL Database with Managed Identity
 
 ```bash
-migrations-cli migrate \
+propel-cli migrate \
   --host myserver.database.windows.net \
   --database featureflags \
   --auth-mode AzureManagedIdentity
@@ -409,7 +409,7 @@ migrations-cli migrate \
 ### Scenario 3: AWS RDS PostgreSQL
 
 ```bash
-migrations-cli migrate \
+propel-cli migrate \
   --host mydb.abc123.us-east-1.rds.amazonaws.com \
   --database featureflags \
   --username master \
@@ -445,10 +445,10 @@ services:
       DB_PASSWORD: postgres
     command: >
       sh -c "
-        dotnet tool install -g Propel.FeatureFlags.MigrationsCLI --version 1.0.0 &&
+        dotnet tool install -g Propel.FeatureFlags.CLI --version 1.0.0 &&
         export PATH=\"$$PATH:/root/.dotnet/tools\" &&
         sleep 5 &&
-        migrations-cli migrate
+        propel-cli migrate
       "
 ```
 
@@ -458,7 +458,7 @@ Run: `docker-compose up`
 
 ## Troubleshooting First-Time Setup
 
-### "migrations-cli: command not found"
+### "propel-cli: command not found"
 
 **Solution 1 (Global Tool):**
 ```bash
@@ -476,10 +476,10 @@ source ~/.bashrc
 **Solution 2 (Binary):**
 ```bash
 # Verify binary location
-which migrations-cli
+which propel-cli
 
 # If not found, add directory to PATH
-export PATH="$PATH:/path/to/migrations-cli"
+export PATH="$PATH:/path/to/propel-cli"
 ```
 
 ### "Could not connect to database"
@@ -528,7 +528,7 @@ GO
 This is normal! Migrations are idempotent. If a migration is already applied, it will be skipped:
 
 ```bash
-migrations-cli status  # Check which migrations are applied
+propel-cli status  # Check which migrations are applied
 ```
 
 ---
@@ -546,9 +546,5 @@ migrations-cli status  # Check which migrations are applied
 
 - **Documentation**: [README.md](README.md)
 - **CI/CD Examples**: [CI-CD-EXAMPLES.md](CI-CD-EXAMPLES.md)
-- **Issues**: [GitHub Issues](https://github.com/yourorg/propel-featureflags-migrations/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourorg/propel-featureflags-migrations/discussions)
-
----
-
-**Congratulations!** 🎉 You've successfully set up the Feature Flags Migration CLI. Your database is ready for the Feature Flags system.
+- **Issues**: [GitHub Issues](https://github.com/Treiben/propel-cli/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Treiben/propel-cli/discussions)
