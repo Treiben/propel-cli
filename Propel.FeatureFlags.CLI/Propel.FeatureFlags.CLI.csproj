@@ -6,13 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>propel-cli</AssemblyName>
-    <RootNamespace>Propel.FeatureFlags.Migrations</RootNamespace>
+    <RootNamespace>Propel.FeatureFlags.CLI</RootNamespace>
     <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- Embed migration files as resources -->
-    <EmbeddedResource Include="Migrations\**\*.sql" />
+    <EmbeddedResource Include="migrations\**\*.sql" />
   </ItemGroup>
 
   <ItemGroup>

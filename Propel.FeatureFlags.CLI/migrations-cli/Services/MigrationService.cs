@@ -200,7 +200,7 @@ public class MigrationService : IMigrationService
 			_ => throw new ArgumentException($"Unsupported provider: {provider}")
 		};
 
-		var resourcePrefix = $"Propel.FeatureFlags.Migrations.Migrations.{providerFolder}.";
+		var resourcePrefix = $"Propel.FeatureFlags.CLI.Migrations.{providerFolder}.";
 
 		var files = new List<MigrationFile>();
 		var resources = assembly.GetManifestResourceNames()
