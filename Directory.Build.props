@@ -1,0 +1,43 @@
+<Project>
+  <PropertyGroup>
+    <Version>1.0.1-beta.1</Version>
+    <PackageVersion>1.0.1-beta.1</PackageVersion>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>
+    
+    <Authors>Tatyana Asriyan</Authors>
+    <Company>Propel</Company>
+
+    <!-- .NET Global Tool Configuration -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>propel-cli</ToolCommandName>
+    <PackageId>Propel.FeatureFlags.CLI</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Propel</Authors>
+    <Company>Propel</Company>
+    <Description>CLI for managing the Propel Feature Flags system. Supports database migrations for SQL Server and PostgreSQL with automatic provider detection, multiple authentication modes, and embedded migrations. Feature flag management capabilities coming soon.</Description>
+    <PackageProjectUrl>https://github.com/Treiben/propel-cli</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Treiben/propel-cli</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Apache2-2.0</PackageLicenseExpression>
+    <PackageTags>propel;feature-flags;migrations;database;sqlserver;postgresql;cli;devops</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>propel.png</PackageIcon>
+    <PackageReleaseNotes>Initial release with SQL Server and PostgreSQL migration support, auto-detection, flexible authentication, and PostgreSQL schema support.</PackageReleaseNotes>
+
+    <!-- Self-Contained Publishing Configuration -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>true</PublishTrimmed>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)propel.png" Pack="true" PackagePath="propel.png" />
+  </ItemGroup>
+</Project>

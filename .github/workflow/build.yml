@@ -1,0 +1,90 @@
+name: Build Self-Contained Binaries
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 1.0.0)'
+        required: true
+
+jobs:
+  build-binaries:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runtime:
+          - linux-x64
+          - linux-arm64
+          - win-x64
+          - osx-x64
+          - osx-arm64
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Set version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION for ${{ matrix.runtime }}"
+      
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Publish Self-Contained Binary
+        run: |
+          dotnet publish \
+            -c Release \
+            -r ${{ matrix.runtime }} \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:PublishTrimmed=true \
+            -p:EnableCompressionInSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -p:Version=${{ steps.version.outputs.VERSION }} \
+            -o ./publish/${{ matrix.runtime }}
+      
+      - name: Create Archive (Linux/macOS)
+        if: startsWith(matrix.runtime, 'linux-') || startsWith(matrix.runtime, 'osx-')
+        run: |
+          cd publish/${{ matrix.runtime }}
+          tar -czf ../../propel-cli-${{ matrix.runtime }}.tar.gz *
+      
+      - name: Create Archive (Windows)
+        if: startsWith(matrix.runtime, 'win-')
+        run: |
+          cd publish/${{ matrix.runtime }}
+          zip -r ../../propel-cli-${{ matrix.runtime }}.zip *
+      
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: propel-cli-${{ matrix.runtime }}
+          path: |
+            propel-cli-*.tar.gz
+            propel-cli-*.zip
+          retention-days: 90
+      
+      - name: Upload to Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            propel-cli-*.tar.gz
+            propel-cli-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
