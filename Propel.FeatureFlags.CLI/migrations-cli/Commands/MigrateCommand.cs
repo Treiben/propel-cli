@@ -5,7 +5,7 @@ using System.CommandLine;
 
 namespace Propel.FeatureFlags.Migrations.CLI;
 
-public class MigrateCommand
+public sealed class MigrateCommand
 {
 	private readonly IServiceProvider _serviceProvider;
 	private readonly ILogger<MigrateCommand> _logger;

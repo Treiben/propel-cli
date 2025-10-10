@@ -16,11 +16,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="admin-cli\Commands\EvaluateFlagCommand.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="admin-cli\Commands\CreateCommand.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
     <PackageReference Include="Npgsql" Version="9.0.4" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
+    <PackageReference Include="Propel.FeatureFlags" Version="1.0.1-beta.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
 

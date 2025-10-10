@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Propel.FeatureFlags.Migrations": {
-      "commandName": "Project",
-      "commandLineArgs": "rollback --version 202510070216 --host localhost --port 5432 --database featureflags --username propel_user --password propel_password --schema production"
+      "commandName": "Project"
     }
   }
 }

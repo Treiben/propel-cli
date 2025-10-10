@@ -7,7 +7,7 @@ public interface IDatabaseProviderFactory
     IDatabaseProvider CreateProvider(string provider);
 }
 
-public class DatabaseProviderFactory : IDatabaseProviderFactory
+public sealed class DatabaseProviderFactory : IDatabaseProviderFactory
 {
     private readonly ILoggerFactory _loggerFactory;
 

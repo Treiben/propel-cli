@@ -5,7 +5,7 @@ using System.CommandLine;
 
 namespace Propel.FeatureFlags.Migrations.CLI;
 
-public class RollbackCommand
+public sealed class RollbackCommand
 {
 	private readonly IServiceProvider _serviceProvider;
 	private readonly ILogger<RollbackCommand> _logger;

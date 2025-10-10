@@ -4,7 +4,7 @@ using System.Data;
 
 namespace Propel.FeatureFlags.Migrations.Providers;
 
-public class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDatabaseProvider
+public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDatabaseProvider
 {
 	public async Task<bool> DatabaseExistsAsync(string connectionString)
 	{

@@ -13,7 +13,7 @@ public interface IMigrationService
 	Task<IEnumerable<MigrationStatus>> GetStatusAsync(string connectionString, string provider, string? migrationsPath = null);
 }
 
-public class MigrationService : IMigrationService
+public sealed class MigrationService : IMigrationService
 {
 	private readonly IDatabaseProviderFactory _providerFactory;
 	private readonly ILogger<MigrationService> _logger;

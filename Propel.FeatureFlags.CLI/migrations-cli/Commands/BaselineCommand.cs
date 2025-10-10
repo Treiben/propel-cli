@@ -5,7 +5,7 @@ using System.CommandLine;
 
 namespace Propel.FeatureFlags.Migrations.CLI;
 
-public class BaselineCommand
+public sealed class BaselineCommand
 {
 	private readonly IServiceProvider _serviceProvider;
 	private readonly ILogger<BaselineCommand> _logger;

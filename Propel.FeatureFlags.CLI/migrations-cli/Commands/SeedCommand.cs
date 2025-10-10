@@ -5,7 +5,7 @@ using System.CommandLine;
 
 namespace Propel.FeatureFlags.Migrations.CLI;
 
-public class SeedCommand
+public sealed class SeedCommand
 {
 	private readonly IServiceProvider _serviceProvider;
 	private readonly ILogger<SeedCommand> _logger;

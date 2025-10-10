@@ -5,7 +5,7 @@ using System.CommandLine;
 
 namespace Propel.FeatureFlags.Migrations.CLI;
 
-public class StatusCommand
+public sealed class StatusCommand
 {
 	private readonly IServiceProvider _serviceProvider;
 	private readonly ILogger<StatusCommand> _logger;

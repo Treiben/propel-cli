@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Propel.FeatureFlags.Admin.CLI;
 using Propel.FeatureFlags.Migrations.CLI;
 using Propel.FeatureFlags.Migrations.Providers;
 using Propel.FeatureFlags.Migrations.Services;
@@ -45,14 +46,29 @@ class Program
 		var seedCommand = new SeedCommand(serviceProvider);
 		rootCommand.AddCommand(seedCommand.Build());
 
+		var createCommand = new CreateCommand(serviceProvider);
+		rootCommand.AddCommand(createCommand.Build());
+
+		var deleteCommand = new DeleteCommand(serviceProvider);
+		rootCommand.AddCommand(deleteCommand.Build());
+
+		var toggleCommand = new ToggleCommand(serviceProvider);
+		rootCommand.AddCommand(toggleCommand.Build());
+
+		var searchCommand = new SearchCommand(serviceProvider);
+		rootCommand.AddCommand(searchCommand.Build());
+
+		var listCommand = new ListCommand(serviceProvider);
+		rootCommand.AddCommand(listCommand.Build());
+
 		// Handle version flag
 		rootCommand.SetHandler((bool showVersion) =>
 		{
 			if (showVersion)
 			{
 				var version = typeof(Program).Assembly.GetName().Version;
-				Console.WriteLine($"Feature Flags Migration CLI v{version}");
-				Console.WriteLine("https://github.com/yourorg/propel-featureflags-migrations");
+				Console.WriteLine($"Feature Flags CLI v{version}");
+				Console.WriteLine("https://github.com/treiben/propel-cli");
 			}
 		}, versionOption);
 
@@ -73,6 +89,8 @@ class Program
 		services.AddSingleton<IDatabaseProviderFactory, DatabaseProviderFactory>();
 		services.AddSingleton<IMigrationService, MigrationService>();
 		services.AddSingleton<ISeedService, SeedService>();
+		services.AddSingleton<Admin.Services.IAdministrationService, Admin.Services.AdministrationService>();
+		services.AddSingleton<Admin.Services.IDatabaseProviderFactory, Admin.Services.DatabaseProviderFactory>();
 
 		// Register command classes (for dependency injection)
 		services.AddTransient<MigrateCommand>();
@@ -80,5 +98,10 @@ class Program
 		services.AddTransient<StatusCommand>();
 		services.AddTransient<BaselineCommand>();
 		services.AddTransient<SeedCommand>();
+		services.AddTransient<CreateCommand>();
+		services.AddTransient<DeleteCommand>();
+		services.AddTransient<ToggleCommand>();
+		services.AddTransient<SearchCommand>();
+		services.AddTransient<ListCommand>();
 	}
 }

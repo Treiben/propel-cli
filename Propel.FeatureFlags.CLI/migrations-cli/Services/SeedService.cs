@@ -9,7 +9,7 @@ public interface ISeedService
     Task SeedAsync(string connectionString, string provider, string seedsPath);
 }
 
-public class SeedService : ISeedService
+public sealed class SeedService : ISeedService
 {
     private readonly IDatabaseProviderFactory _providerFactory;
     private readonly ILogger<SeedService> _logger;
