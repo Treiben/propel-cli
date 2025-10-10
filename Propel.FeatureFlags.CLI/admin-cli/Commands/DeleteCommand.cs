@@ -13,6 +13,7 @@ public sealed class DeleteCommand(IServiceProvider serviceProvider)
 	public async Task ExecuteAsync(
 						string? connectionString,
 						string? key,
+						string? applicationName,
 						string? username)
 	{
 		try
@@ -29,7 +30,7 @@ public sealed class DeleteCommand(IServiceProvider serviceProvider)
 			_logger.LogInformation("Provider: {Provider}", provider);
 
 			var administrationService = serviceProvider.GetRequiredService<IAdministrationService>();
-			await administrationService.DeleteAsync(connectionString, provider, key, username);
+			await administrationService.DeleteAsync(connectionString, provider, key, applicationName ?? "global", username);
 
 			Console.WriteLine($"\nSuccess: Flag '{key}' deleted from database");
 			Console.WriteLine("\nIMPORTANT:");
@@ -68,6 +69,12 @@ public sealed class DeleteCommand(IServiceProvider serviceProvider)
 			IsRequired = true
 		};
 
+		var applicationOption = new Option<string?>("--application")
+		{
+			Description = "Application name where flag is originated (required). Must match exactly. Global flags default to 'global' application name.",
+			IsRequired = true
+		};
+
 		var usernameOption = new Option<string?>("--username")
 		{
 			Description = "Username for audit trail (required). Used to track who deleted the flag.",
@@ -77,14 +84,16 @@ public sealed class DeleteCommand(IServiceProvider serviceProvider)
 		deleteCommand.AddOption(connectionStringOption);
 		deleteCommand.AddOption(keyOption);
 		deleteCommand.AddOption(usernameOption);
+		deleteCommand.AddOption(applicationOption);
 
 		deleteCommand.SetHandler(async (context) =>
 		{
 			var connectionString = context.ParseResult.GetValueForOption(connectionStringOption);
 			var key = context.ParseResult.GetValueForOption(keyOption);
 			var username = context.ParseResult.GetValueForOption(usernameOption);
+			var applicationName = context.ParseResult.GetValueForOption(applicationOption);
 
-			await ExecuteAsync(connectionString, key, username);
+			await ExecuteAsync(connectionString, key, applicationName, username);
 		});
 
 		return deleteCommand;

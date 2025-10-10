@@ -11,7 +11,7 @@ public class FeatureFlagAudit
 	public string FlagKey { get; set; } = null!;
 
 	[JsonPropertyName("application_name")]
-	public string? ApplicationName { get; set; } = "global";
+	public string ApplicationName { get; set; } = "global";
 
 	[JsonPropertyName("application_version")]
 	public string ApplicationVersion { get; set; } = "0.0.0.0";

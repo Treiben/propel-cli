@@ -13,6 +13,7 @@ public sealed class ToggleCommand(IServiceProvider serviceProvider)
 	public async Task ExecuteAsync(
 						string? connectionString,
 						string? key,
+						string? applicationName,
 						bool enable,
 						string? username)
 	{
@@ -30,7 +31,7 @@ public sealed class ToggleCommand(IServiceProvider serviceProvider)
 			_logger.LogInformation("Provider: {Provider}", provider);
 
 			var administrationService = serviceProvider.GetRequiredService<IAdministrationService>();
-			await administrationService.ToggleModeAsync(connectionString, provider, key, enable, username);
+			await administrationService.ToggleModeAsync(connectionString, provider, key, applicationName ?? "global", enable, username);
 
 			string action = enable ? "ENABLED (On)" : "DISABLED (Off)";
 			Console.WriteLine($"\nSuccess: Flag '{key}' is now {action}");
@@ -73,6 +74,12 @@ public sealed class ToggleCommand(IServiceProvider serviceProvider)
 			IsRequired = true
 		};
 
+		var applicationOption = new Option<string?>("--application")
+		{
+			Description = "Application name where flag is originated (required). Must match exactly. Global flags default to 'global' application name.",
+			IsRequired = true
+		};
+
 		var usernameOption = new Option<string?>("--username")
 		{
 			Description = "Username for audit trail (required). Used to track who toggled the flag.",
@@ -93,6 +100,7 @@ public sealed class ToggleCommand(IServiceProvider serviceProvider)
 
 		toggleCommand.AddOption(connectionStringOption);
 		toggleCommand.AddOption(keyOption);
+		toggleCommand.AddOption(applicationOption);
 		toggleCommand.AddOption(usernameOption);
 		toggleCommand.AddOption(onOption);
 		toggleCommand.AddOption(offOption);
@@ -101,6 +109,7 @@ public sealed class ToggleCommand(IServiceProvider serviceProvider)
 		{
 			var connectionString = context.ParseResult.GetValueForOption(connectionStringOption);
 			var key = context.ParseResult.GetValueForOption(keyOption);
+			var applicationName = context.ParseResult.GetValueForOption(applicationOption);
 			var username = context.ParseResult.GetValueForOption(usernameOption);
 			var on = context.ParseResult.GetValueForOption(onOption);
 			var off = context.ParseResult.GetValueForOption(offOption);
@@ -120,7 +129,7 @@ public sealed class ToggleCommand(IServiceProvider serviceProvider)
 			}
 
 			var enable = on;
-			await ExecuteAsync(connectionString, key, enable, username);
+			await ExecuteAsync(connectionString, key, applicationName, enable, username);
 		});
 
 		return toggleCommand;

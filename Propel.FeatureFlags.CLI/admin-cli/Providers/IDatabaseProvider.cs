@@ -8,7 +8,7 @@ public interface IDatabaseProvider
 
 	Task CreateFlagAsync(string connectionString, FeatureFlag flag, FeatureFlagMetadata metadata, FeatureFlagAudit audit);
 
-	Task<FeatureFlag?> GetFlagByKeyAsync(string connectionString, string flagKey);
+	Task<List<FeatureFlag>> GetFlagsByKeyAndApplicationAsync(string connectionString, string flagKey, string applicationName);
 
 	Task DeleteFlagAsync(string connectionString, string flagKey, FeatureFlagAudit audit);
 

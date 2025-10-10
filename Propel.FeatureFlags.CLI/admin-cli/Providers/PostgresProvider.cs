@@ -142,7 +142,7 @@ public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDa
 		}
 	}
 
-	public async Task<FeatureFlag?> GetFlagByKeyAsync(string connectionString, string flagKey)
+	public async Task<List<FeatureFlag>> GetFlagsByKeyAndApplicationAsync(string connectionString, string flagKey, string applicationName)
 	{
 		await using var connection = new NpgsqlConnection(connectionString);
 		await connection.OpenAsync();
@@ -159,17 +159,20 @@ public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDa
 				enabled_tenants, disabled_tenants, tenant_percentage_enabled,
 				variations, default_variation
 			FROM feature_flags
-			WHERE key = @key AND application_name = 'global' AND application_version = '0.0.0.0'";
+			WHERE key = @key and application_name = @application_name";
 
 		command.Parameters.AddWithValue("@key", flagKey);
+		command.Parameters.AddWithValue("@application_name", applicationName);
 
 		await using var reader = await command.ExecuteReaderAsync();
-		if (await reader.ReadAsync())
+
+		var flags = new List<FeatureFlag>();
+		while (await reader.ReadAsync())
 		{
-			return MapFeatureFlag(reader);
+			flags.Add(MapFeatureFlag(reader));
 		}
 
-		return null;
+		return flags;
 	}
 
 	public async Task DeleteFlagAsync(string connectionString, string flagKey, FeatureFlagAudit audit)
@@ -188,10 +191,10 @@ public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDa
 				command.CommandText = @"
 					DELETE FROM feature_flags_metadata 
 					WHERE flag_key = @flag_key 
-					AND application_name = 'global' 
-					AND application_version = '0.0.0.0'";
+					AND application_name = @application_name";
 
 				command.Parameters.AddWithValue("@flag_key", flagKey);
+				command.Parameters.AddWithValue("@application_name", audit.ApplicationName);
 				await command.ExecuteNonQueryAsync();
 			}
 
@@ -202,10 +205,10 @@ public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDa
 				command.CommandText = @"
 					DELETE FROM feature_flags 
 					WHERE key = @key 
-					AND application_name = 'global' 
-					AND application_version = '0.0.0.0'";
+					AND application_name = @application_name";
 
 				command.Parameters.AddWithValue("@key", flagKey);
+				command.Parameters.AddWithValue("@application_name", audit.ApplicationName);
 				var rowsAffected = await command.ExecuteNonQueryAsync();
 
 				if (rowsAffected == 0)
@@ -228,7 +231,7 @@ public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDa
 					)";
 
 				command.Parameters.AddWithValue("@flag_key", audit.FlagKey);
-				command.Parameters.AddWithValue("@application_name", audit.ApplicationName ?? "global");
+				command.Parameters.AddWithValue("@application_name", audit.ApplicationName);
 				command.Parameters.AddWithValue("@application_version", audit.ApplicationVersion);
 				command.Parameters.AddWithValue("@action", audit.Action);
 				command.Parameters.AddWithValue("@actor", audit.Actor);
@@ -258,7 +261,6 @@ public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDa
 
 		try
 		{
-			// Update feature_flags
 			await using (var command = connection.CreateCommand())
 			{
 				command.Transaction = transaction;
@@ -266,10 +268,10 @@ public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDa
 					UPDATE feature_flags 
 					SET evaluation_modes = @evaluation_modes
 					WHERE key = @key 
-					AND application_name = 'global' 
-					AND application_version = '0.0.0.0'";
+					AND application_name = @application_name";
 
 				command.Parameters.AddWithValue("@key", flagKey);
+				command.Parameters.AddWithValue("@application_name", audit.ApplicationName);
 				command.Parameters.AddWithValue("@evaluation_modes", NpgsqlTypes.NpgsqlDbType.Jsonb, JsonSerializer.Serialize(evaluationModes));
 
 				var rowsAffected = await command.ExecuteNonQueryAsync();
@@ -294,7 +296,7 @@ public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDa
 					)";
 
 				command.Parameters.AddWithValue("@flag_key", audit.FlagKey);
-				command.Parameters.AddWithValue("@application_name", audit.ApplicationName ?? "global");
+				command.Parameters.AddWithValue("@application_name", audit.ApplicationName);
 				command.Parameters.AddWithValue("@application_version", audit.ApplicationVersion);
 				command.Parameters.AddWithValue("@action", audit.Action);
 				command.Parameters.AddWithValue("@actor", audit.Actor);
@@ -322,9 +324,6 @@ public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDa
 
 		var conditions = new List<string>();
 		var command = connection.CreateCommand();
-
-		// Always filter for global flags
-		conditions.Add("application_name = 'global' AND application_version = '0.0.0.0'");
 
 		// Add search conditions (OR logic)
 		var searchConditions = new List<string>();
@@ -394,7 +393,6 @@ public sealed class PostgreSqlProvider(ILogger<PostgreSqlProvider> logger) : IDa
 				enabled_tenants, disabled_tenants, tenant_percentage_enabled,
 				variations, default_variation
 			FROM feature_flags
-			WHERE application_name = 'global' AND application_version = '0.0.0.0'
 			ORDER BY key";
 
 		var flags = new List<FeatureFlag>();

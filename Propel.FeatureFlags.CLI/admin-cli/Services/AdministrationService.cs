@@ -7,10 +7,10 @@ namespace Propel.FeatureFlags.Admin.Services;
 public interface IAdministrationService
 {
 	Task CreateAsync(string connectionString, string provider, string fromJson, string username);
-	Task DeleteAsync(string connectionString, string provider, string flagKey, string username);
-	Task ToggleModeAsync(string connectionString, string provider, string flagKey, bool enable, string username);
-	Task<List<Models.FeatureFlag>> SearchAsync(string connectionString, string provider, string? flagKey, string? name, string? description);
-	Task<List<Models.FeatureFlag>> ListAllAsync(string connectionString, string provider);
+	Task DeleteAsync(string connectionString, string provider, string flagKey, string applicationName, string username);
+	Task ToggleModeAsync(string connectionString, string provider, string flagKey, string applicationName, bool enable, string username);
+	Task<List<FeatureFlag>> SearchAsync(string connectionString, string provider, string? flagKey, string? name, string? description);
+	Task<List<FeatureFlag>> ListAllAsync(string connectionString, string provider);
 }
 
 public sealed class AdministrationService(IDatabaseProviderFactory providerFactory, ILogger<AdministrationService> logger) : IAdministrationService
@@ -36,8 +36,8 @@ public sealed class AdministrationService(IDatabaseProviderFactory providerFacto
 		flag.ApplicationVersion = "0.0.0.0";
 
 		// Check if flag already exists
-		var existingFlag = await dbProvider.GetFlagByKeyAsync(connectionString, flag.Key);
-		if (existingFlag != null)
+		var existingFlags = await dbProvider.GetFlagsByKeyAndApplicationAsync(connectionString, flag.Key, "global");
+		if (existingFlags.Count > 0)
 		{
 			throw new InvalidOperationException($"Flag with key '{flag.Key}' already exists");
 		}
@@ -75,7 +75,7 @@ public sealed class AdministrationService(IDatabaseProviderFactory providerFacto
 		Console.WriteLine($"Success: Flag '{flag.Key}' created");
 	}
 
-	public async Task DeleteAsync(string connectionString, string provider, string flagKey, string username)
+	public async Task DeleteAsync(string connectionString, string provider, string flagKey, string applicationName, string username)
 	{
 		var dbProvider = providerFactory.CreateProvider(provider);
 
@@ -85,14 +85,17 @@ public sealed class AdministrationService(IDatabaseProviderFactory providerFacto
 		}
 
 		// Check if flag exists
-		_ = await dbProvider.GetFlagByKeyAsync(connectionString, flagKey) ?? throw new InvalidOperationException($"Flag with key '{flagKey}' not found");
+		var flags = await dbProvider.GetFlagsByKeyAndApplicationAsync(connectionString, flagKey, applicationName);
+		
+		if (flags.Count == 0)
+			throw new InvalidOperationException($"Flag with key '{flagKey}' not found");
 
 		// Create audit record
 		var audit = new FeatureFlagAudit
 		{
 			FlagKey = flagKey,
-			ApplicationName = "global",
-			ApplicationVersion = "0.0.0.0",
+			ApplicationName = applicationName,
+			ApplicationVersion = applicationName == "global" ? "0.0.0.0" : "1.0.0.0",
 			Action = "flag-deleted",
 			Actor = username,
 			Timestamp = DateTime.UtcNow,
@@ -105,7 +108,7 @@ public sealed class AdministrationService(IDatabaseProviderFactory providerFacto
 		Console.WriteLine($"Success: Flag '{flagKey}' deleted");
 	}
 
-	public async Task ToggleModeAsync(string connectionString, string provider, string flagKey, bool enable, string username)
+	public async Task ToggleModeAsync(string connectionString, string provider, string flagKey, string? applicationName, bool enable, string username)
 	{
 		var dbProvider = providerFactory.CreateProvider(provider);
 
@@ -115,7 +118,9 @@ public sealed class AdministrationService(IDatabaseProviderFactory providerFacto
 		}
 
 		// Check if flag exists
-		_ = await dbProvider.GetFlagByKeyAsync(connectionString, flagKey) ?? throw new InvalidOperationException($"Flag with key '{flagKey}' not found");
+		var flags = await dbProvider.GetFlagsByKeyAndApplicationAsync(connectionString, flagKey, applicationName);
+		if (flags.Count == 0)
+			throw new InvalidOperationException($"Flag with key '{flagKey}' not found");
 
 		// Determine new evaluation mode
 		// 0 = Off, 1 = On
@@ -125,8 +130,8 @@ public sealed class AdministrationService(IDatabaseProviderFactory providerFacto
 		var audit = new FeatureFlagAudit
 		{
 			FlagKey = flagKey,
-			ApplicationName = "global",
-			ApplicationVersion = "0.0.0.0",
+			ApplicationName = applicationName ?? "global",
+			ApplicationVersion = !string.IsNullOrWhiteSpace(applicationName) ? "1.0.0.0" : "0.0.0.0",
 			Action = enable ? "flag-enabled" : "flag-disabled",
 			Actor = username,
 			Timestamp = DateTime.UtcNow,
@@ -139,7 +144,7 @@ public sealed class AdministrationService(IDatabaseProviderFactory providerFacto
 		Console.WriteLine($"Success: Flag '{flagKey}' {(enable ? "enabled" : "disabled")}");
 	}
 
-	public async Task<List<Models.FeatureFlag>> SearchAsync(string connectionString, string provider, string? flagKey, string? name, string? description)
+	public async Task<List<FeatureFlag>> SearchAsync(string connectionString, string provider, string? flagKey, string? name, string? description)
 	{
 		var dbProvider = providerFactory.CreateProvider(provider);
 
@@ -155,7 +160,7 @@ public sealed class AdministrationService(IDatabaseProviderFactory providerFacto
 		return flags;
 	}
 
-	public async Task<List<Models.FeatureFlag>> ListAllAsync(string connectionString, string provider)
+	public async Task<List<FeatureFlag>> ListAllAsync(string connectionString, string provider)
 	{
 		var dbProvider = providerFactory.CreateProvider(provider);
 

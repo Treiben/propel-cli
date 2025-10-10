@@ -37,8 +37,8 @@ public static class FlagOutputFormatter
 	private static void DisplayAsTable(List<FeatureFlag> flags)
 	{
 		Console.WriteLine($"\nTotal: {flags.Count} flag(s)\n");
-		Console.WriteLine($"{"Key",-45} {"Name",-45} {"Modes",-30} {"Description"}");
-		Console.WriteLine(new string('-', 140));
+		Console.WriteLine($"{"Key",-45} {"Name",-45} {"Application",-30} {"Modes",-30} {"Description"}");
+		Console.WriteLine(new string('-', 210));
 
 		foreach (var flag in flags)
 		{
@@ -47,7 +47,7 @@ public static class FlagOutputFormatter
 				? flag.Description[..47] + "..."
 				: flag.Description;
 
-			Console.WriteLine($"{flag.Key,-45} {flag.Name,-45} {modes,-30} {description}");
+			Console.WriteLine($"{flag.Key,-45} {flag.Name,-45} {flag.ApplicationName,-30} {modes,-30} {description}");
 		}
 
 		Console.WriteLine();
