@@ -434,6 +434,14 @@ which propel-cli
 export PATH="$PATH:/path/to/propel-cli"
 ```
 
+### "Could not detect database provider"
+Explicitly specify: `--provider postgresql` or `--provider sqlserver`
+
+### "No embedded migration resources found"
+1. Verify folder structure: `migrations/SqlServer/` and `migrations/PostgreSQL/`
+2. Check `.csproj` has: `<EmbeddedResource Include="migrations\**\*.sql" />`
+3. Rebuild: `dotnet clean && dotnet build`
+
 ### "Could not connect to database"
 
 **Checklist:**
@@ -489,7 +497,7 @@ propel-cli status  # Check which migrations are applied
 
 1. **Explore Commands**: Try `rollback`, `baseline`, and `seed` commands
 2. **Read Documentation**: Check [README.md](..\README.md) for full command reference
-3. **CI/CD Integration**: Set up automated migrations using [cicd_examples.md](cicd_examplesS.md)
+3. **CI/CD Integration**: Set up automated migrations using [cicd_examples.md](cicd_examples.md)
 4. **Create Custom Migrations**: Learn how to add your own migrations (see README.md)
 
 
