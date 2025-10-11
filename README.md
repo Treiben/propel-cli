@@ -1,6 +1,12 @@
 ﻿# Propel CLI
 
-A cross-platform CLI for managing the Propel Feature Flags system. Currently supports database migrations with CI/CD integration and limited feature flags management capabilities. 
+[![Build and Test](https://github.com/Treiben/propel-cli/actions/workflows/build.yml/badge.svg)](https://github.com/Treiben/propel-cli/actions/workflows/build.yml)
+[![NuGet](https://img.shields.io/nuget/v/Propel.FeatureFlags.CLI.svg)](https://www.nuget.org/packages/Propel.FeatureFlags.CLI/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Propel.FeatureFlags.CLI.svg)](https://www.nuget.org/packages/Propel.FeatureFlags.CLI/)
+[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4)](https://dotnet.microsoft.com/download)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
+A cross-platform CLI for managing the Propel Feature Flags system. Currently supports database migrations with CI/CD integration and limited feature flags management capabilities.
 
 ## Features
 
