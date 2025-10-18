@@ -9,7 +9,7 @@ Complete setup guide for the Feature Flags CLI - from installation to your first
 3. [Initial Configuration](#initial-configuration)
 4. [Your First Migration](#your-first-migration)
 5. [Setting Up CI/CD](#setting-up-cicd)
-6. [Production Checklist](#production-checklist)
+6. [Troubleshooting First Time Setup](#troubleshooting-first-time-setup)
 
 ---
 
@@ -408,7 +408,7 @@ Run: `docker-compose up`
 
 ---
 
-## Troubleshooting First-Time Setup
+## Troubleshooting First Time Setup
 
 ### "propel-cli: command not found"
 

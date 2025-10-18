@@ -1,19 +1,19 @@
 <Project>
   <PropertyGroup>
-    <Version>1.1.1-beta.1</Version>
-    <PackageVersion>1.1.1-beta.1</PackageVersion>
+    <Version>1.1.2-beta.1.2</Version>
+    <PackageVersion>1.1.2-beta.1.2</PackageVersion>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
     <FileVersion>1.0.0.1</FileVersion>
 
     <Authors>Tatyana Asriyan</Authors>
-    <Company>Propel</Company>
+    <Company>Treiben</Company>
 
     <!-- .NET Global Tool Configuration -->
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>propel-cli</ToolCommandName>
     <PackageId>Propel.FeatureFlags.CLI</PackageId>
-    <Description>CLI for managing the Propel Feature Flags system. Supports database migrations for SQL Server and PostgreSQL with automatic provider detection, multiple authentication modes, and embedded migrations. Feature flag management capabilities coming soon.</Description>
-    <PackageProjectUrl>https://github.com/Treiben/propel-cli</PackageProjectUrl>
+    <Description>CLI for managing the Propel Feature Flags system. Supports database migrations for SQL Server and PostgreSQL with automatic provider detection, multiple authentication modes, and embedded migrations. Feature flag management capabilities now included.</Description>
+    <PackageProjectUrl>https://github.com/Treiben</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Treiben/propel-cli</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

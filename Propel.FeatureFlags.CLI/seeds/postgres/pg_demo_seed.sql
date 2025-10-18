@@ -32,8 +32,8 @@ SET my.global_name = 'global';
 SET my.global_version = '0.0.0.0';
 
 SET my.app_scope = 2;
-SET my.app_name = 'WebClientDemo';
-SET my.app_version = '1.0.0.0';
+SET my.app_name = 'DemoWebApi';
+SET my.app_version = '1.0.0.1';
 
 ------------------------------------------------------------------------
 SET my.flag_key = 'admin-panel-enabled';

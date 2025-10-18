@@ -61,7 +61,7 @@ WHEN MATCHED THEN
 		DisabledUsers = '[]',
 		TargetingRules = '[{"attribute":"role","operator":4,"values":["admin","super-admin"],"variation":"on"},{"attribute":"department","operator":4,"values":["engineering","operations"],"variation":"on"}]',
 		Variations = '{}',
-		DefaultVariation = 'off'
+		DefaultVariation = ''
 WHEN NOT MATCHED THEN
 	INSERT ([Key], ApplicationName, ApplicationVersion, Scope, Name, Description, EvaluationModes, DefaultVariation, TargetingRules)
 	VALUES (@FlagKey, @AppName, @AppVersion, @AppScope, 
