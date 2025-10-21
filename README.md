@@ -51,17 +51,13 @@ For more troubleshooting, see the [Setup Guide](./docs/setup_guide.md#troublesho
 - 🔄 MySQL support (planned)
 - 🔄 SQLite support (planned)
 
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/Treiben/propel-cli).
-
 ## Support
-
 - **Issues**: [GitHub Issues](https://github.com/Treiben/propel-cli/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/Treiben/propel-cli/discussions)
 
+## Contributing
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/Treiben/propel-cli).
+
 ## License
-
 Licensed under the Apache License, Version 2.0.
-
 Copyright 2025 Tatyana Asriyan
