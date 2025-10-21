@@ -62,4 +62,6 @@ Contributions are welcome! Please open an issue or submit a pull request on [Git
 
 ## License
 
-Apache-2.0 License - see LICENSE file for details
+Licensed under the Apache License, Version 2.0.
+
+Copyright 2025 Tatyana Asriyan
